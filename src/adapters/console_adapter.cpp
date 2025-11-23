@@ -164,18 +164,6 @@ void GraphConsoleAdapter::register_graph_commands() {
         [this](const std::vector<std::string>&) { cmd_smile(); },
         "SMILE!!!!!"
     );
-
-    console.register_command("traversal",
-        [this](const std::vector<std::string>& args) { cmd_traversal(args); },
-        "Traverse graph",
-        {"start vertex", "--representation (m || l)", "--method (bfs || dfs)"}
-    );
-
-    console.register_command("compare",
-        [this](const std::vector<std::string>& args) { cmd_compare(args); },
-        "Compare methods of traversal",
-        {"start_vertex"}
-    );
 }
 
 void GraphConsoleAdapter::cmd_create(const std::vector<std::string>& args) {
@@ -244,95 +232,4 @@ void GraphConsoleAdapter::cmd_help(const std::vector<std::string>& args) {
 
 void GraphConsoleAdapter::cmd_history() {
     console.show_history();
-}
-
-void GraphConsoleAdapter::cmd_traversal(const std::vector<std::string> &args) const {
-    if (!graphs_created) {
-        std::cout << "No graphs created. Use 'create' command first." << std::endl;
-        return;
-    }
-
-    try {
-        const int v = args.empty() ? 0 : std::stoi(args[0]);
-        const std::string rep = args.size() > 1 ? args[1] : "--m";
-        const std::string met = args.size() > 2 ? args[2] : "--bfs";
-
-        if (v >= graph->n || v < 0) {
-            std::cout << "Invalid number of vertices." << std::endl;
-            return;
-        }
-        if (rep != "--l" && rep != "--m") {
-            std::cout << "Invalid representation." << std::endl;
-            return;
-        }
-        if (met != "--bfs" && met != "--dfs") {
-            std::cout << "Invalid method." << std::endl;
-            return;
-        }
-
-        const bool representation = rep != "--m";
-        const bool method = met != "--bfs";
-
-        prep(*graph, v, representation, method);
-    } catch (const std::exception& e) {
-        std::cout << "Error BFSD: " << e.what() << std::endl;
-    }
-}
-
-void GraphConsoleAdapter::cmd_compare(const std::vector<std::string>& args) const {
-    struct nullbuf : std::streambuf {
-        int overflow(int c) override {return c;}
-    };
-
-    if (!graphs_created) {
-        std::cout << "No graphs created. Use 'create' command first." << std::endl;
-        return;
-    }
-
-    try {
-        nullbuf nb;
-        std::ostream devnull(&nb);
-        // const int v = args.empty() ? 0 : std::stoi(args[0]);
-        if (args.empty()) {
-            compare(*graph);
-            return;
-        }
-
-        const int v = std::stoi(args[0]);
-
-        if (v >= graph->n || v < 0) {
-            std::cout << "Invalid number of vertex" << std::endl;
-            return;
-        }
-
-        std::streambuf* old = std::cout.rdbuf();
-        std::cout.rdbuf(devnull.rdbuf());
-        auto t1 = prep(*graph, v, false, false);
-        auto t2 = prep(*graph, v, false, true);
-        auto t3 = prep(*graph, v, true, false);
-        auto t4 = prep(*graph, v, true, true);
-        std::cout.rdbuf(old);
-
-        std::cout << "===Matrix BFS===" << std::endl;
-        double timeSec = static_cast<double>(t1) / 1000000.0;
-        std::cout << "Time: " << t1 << " us, or " << timeSec << " s" << std::endl;
-        std::cout << std::endl;
-
-        std::cout << "===Matrix DFS===" << std::endl;
-        timeSec = static_cast<double>(t2) / 1000000.0;
-        std::cout << "Time: " << t2 << " us, or " << timeSec << " s" << std::endl;
-        std::cout << std::endl;
-
-        std::cout << "===List BFS===" << std::endl;
-        timeSec = static_cast<double>(t3) / 1000000.0;
-        std::cout << "Time: " << t3 << " us, or " << timeSec << " s" << std::endl;
-        std::cout << std::endl;
-
-        std::cout << "===List DFS===" << std::endl;
-        timeSec = static_cast<double>(t4) / 1000000.0;
-        std::cout << "Time: " << t4 << " us, or " << timeSec << " s" << std::endl;
-        std::cout << std::endl;
-    } catch (const std::exception& e) {
-        std::cout << "Error traversal: " << e.what() << std::endl;
-    }
 }
