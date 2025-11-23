@@ -192,4 +192,19 @@ std::vector<std::vector<int> > build_distance_matrix(const Graph &graph) {
     return distances;
 }
 
+std::vector<int> compute_eccentricities(const std::vector<std::vector<int> > &dist_matrix) {
+    std::vector<int> eccentricities(dist_matrix.size(), -1);
+
+    for (int i = 0; i < dist_matrix.size(); i++) {
+        int max_dist = -1;
+        for (int j : dist_matrix[i]) {
+            if (j != -1 && j > max_dist) {
+                max_dist = j;
+            }
+        }
+        eccentricities[i] = max_dist;
+    }
+
+    return eccentricities;
+}
 
