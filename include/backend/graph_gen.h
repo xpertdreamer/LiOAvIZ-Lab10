@@ -58,4 +58,11 @@ extern void BFSD(const Graph& graph, int start_v, std::vector<int>& DIST);
  * @param start_v Start vector
  */
 extern void print_distances(const std::vector<int>& DIST, int start_v);
+
+/**
+ * Calculating the distance matrix between all pairs of vertices using BFS
+ * @param graph Processed graph
+ * @return Distances matrix n x n
+ */
+extern std::vector<std::vector<int>> build_distance_matrix(const Graph& graph);
 #endif //GRAPH_GEN_H

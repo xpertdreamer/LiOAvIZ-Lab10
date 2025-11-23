@@ -180,3 +180,16 @@ void print_distances(const std::vector<int> &DIST, const int start_v) {
         }
     }
 }
+
+std::vector<std::vector<int> > build_distance_matrix(const Graph &graph) {
+    std::vector<std::vector<int> > distances(graph.n, std::vector<int>(graph.n, -1));
+    for (int i = 0; i < graph.n; i++) {
+        std::vector<int> dist_from_i(graph.n, -1);
+        BFSD(graph, i, dist_from_i);
+        distances[i] = dist_from_i;
+    }
+
+    return distances;
+}
+
+

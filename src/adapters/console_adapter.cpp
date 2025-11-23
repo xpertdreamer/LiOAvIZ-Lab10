@@ -23,7 +23,7 @@
 
 namespace fs = std::filesystem;
 
-GraphConsoleAdapter::GraphConsoleAdapter(bool is_weighted, bool is_directed ,const std::string& config_path, const std::string& aliases_path): graphs_created(false), graph(nullptr), n(0) {
+GraphConsoleAdapter::GraphConsoleAdapter(const bool is_weighted, const bool is_directed ,const std::string& config_path, const std::string& aliases_path): graphs_created(false), graph(nullptr), n(0) {
     weighted = is_weighted;
     directed = is_directed;
 
