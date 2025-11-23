@@ -77,4 +77,7 @@ extern int compute_diameter(const std::vector<int>& ecc);
 
 
 extern std::vector<int> find_central_vertices(const std::vector<int>& ecc, int radius);
+
+
+extern std::vector<int> find_peripheral_vertices(const std::vector<int>& ecc, int diameter);
 #endif //GRAPH_GEN_H
