@@ -68,4 +68,7 @@ extern std::vector<std::vector<int>> build_distance_matrix(const Graph& graph);
 
 
 extern std::vector<int> compute_eccentricities(const std::vector<std::vector<int>>& dist_matrix);
+
+
+extern int compute_radius(const std::vector<int>& ecc);
 #endif //GRAPH_GEN_H

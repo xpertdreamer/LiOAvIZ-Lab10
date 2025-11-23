@@ -208,3 +208,14 @@ std::vector<int> compute_eccentricities(const std::vector<std::vector<int> > &di
     return eccentricities;
 }
 
+int compute_radius(const std::vector<int> &ecc) {
+    int radius = std::numeric_limits<int>::max();
+
+    for (const int e : ecc) {
+        if (e != -1 && e < radius) {
+            radius = e;
+        }
+    }
+
+    return radius == std::numeric_limits<int>::max() ? -1 : radius;
+}
