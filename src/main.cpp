@@ -31,7 +31,7 @@ GraphParameters parse_args(const int argc, char **argv) {
         {"--directed", [](GraphParameters& params) {params.is_directed = true; }}
     };
 
-    GraphParameters params{};
+    GraphParameters params{false, false};
 
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -43,7 +43,8 @@ GraphParameters parse_args(const int argc, char **argv) {
         if (auto it = options.find(arg); it != options.end()) {
             it->second(params);
         } else {
-            if (arg != "-h" || arg != "--help") std::cerr << "Unknown option: " << arg << "\nUse -h for help" << std::endl;
+            if (arg != "-h" && arg != "--help") std::cerr << "Unknown option: " << arg << "\nUse -h for help" <<
+                                                std::endl;
             exit(EXIT_FAILURE);
         }
     }
