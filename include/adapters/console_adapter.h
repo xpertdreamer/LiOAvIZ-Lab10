@@ -12,7 +12,8 @@
 
 class GraphConsoleAdapter {
     public:
-    explicit GraphConsoleAdapter(const std::string& config_path = "", const std::string& aliases_path = "");
+    explicit GraphConsoleAdapter(bool is_weighted, bool is_directed,
+        const std::string& config_path = "", const std::string& aliases_path = "");
     ~GraphConsoleAdapter();
 
     void run();

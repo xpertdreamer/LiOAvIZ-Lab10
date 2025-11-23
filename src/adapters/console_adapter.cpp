@@ -23,7 +23,7 @@
 
 namespace fs = std::filesystem;
 
-GraphConsoleAdapter::GraphConsoleAdapter(const std::string& config_path, const std::string& aliases_path): graphs_created(false), graph(nullptr), n(0) {
+GraphConsoleAdapter::GraphConsoleAdapter(bool is_weighted, bool is_directed ,const std::string& config_path, const std::string& aliases_path): graphs_created(false), graph(nullptr), n(0) {
     // const std::string config_file = ("../../resources/config_files/graph_console.conf");
     // const std::string aliases_file = ("../../resources/config_files/aliases.conf");
 
