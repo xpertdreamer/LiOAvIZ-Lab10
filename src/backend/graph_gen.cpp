@@ -219,3 +219,16 @@ int compute_radius(const std::vector<int> &ecc) {
 
     return radius == std::numeric_limits<int>::max() ? -1 : radius;
 }
+
+int compute_diameter(const std::vector<int> &ecc) {
+    int diameter = -1;
+
+    for (const int e : ecc) {
+        if (e > diameter) {
+            diameter = e;
+        }
+    }
+
+    return diameter;
+}
+

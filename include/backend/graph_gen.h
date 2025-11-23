@@ -71,4 +71,7 @@ extern std::vector<int> compute_eccentricities(const std::vector<std::vector<int
 
 
 extern int compute_radius(const std::vector<int>& ecc);
+
+
+extern int compute_diameter(const std::vector<int>& ecc);
 #endif //GRAPH_GEN_H
