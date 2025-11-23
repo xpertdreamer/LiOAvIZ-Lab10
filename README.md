@@ -16,21 +16,25 @@
 
 ### Quick Integration
 
-#### 1. Basic Setup
-Include the header and initialize in your `main.cpp`:
+#### 1. Basic Setup with Command Line Arguments
+Include the header and initialize in your `main.cpp` with advanced argument parsing:
 
 ```cpp
 #include "adapters/console_adapter.h"
 
-int main() {
-    try {
-        // With custom config paths
-        GraphConsoleAdapter adapter("config/console.conf", "config/aliases.conf");
-    
-        // Or with auto-detected configs
-        // GraphConsoleAdapter adapter;
+struct GraphParameters {
+    bool is_weighted;
+    bool is_directed;
+};
 
-        adapter.run();
+GraphParameters parse_args(int argc, char **argv);
+void print_help(const char* program_name);
+
+int main(const int argc, char *argv[]) {
+    try {
+        const GraphParameters params = parse_args(argc, argv);
+        GraphConsoleAdapter console(params.is_weighted, params.is_directed);
+        console.run();
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
@@ -40,16 +44,71 @@ int main() {
     }
     return 0;
 }
+
+GraphParameters parse_args(const int argc, char **argv) {
+    static const std::unordered_map<std::string, std::function<void(GraphParameters&)>> options = {
+        {"-w", [](GraphParameters& params) { params.is_weighted = true; }},
+        {"--weighted", [](GraphParameters& params) { params.is_weighted = true; }},
+        {"-d", [](GraphParameters& params) { params.is_directed = true; }},
+        {"--directed", [](GraphParameters& params) { params.is_directed = true; }}
+    };
+
+    GraphParameters params{false, false};
+
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+
+        if (arg == "-h" || arg == "--help") {
+            print_help(argv[0]);
+        }
+
+        if (auto it = options.find(arg); it != options.end()) {
+            it->second(params);
+        } else {
+            if (arg != "-h" && arg != "--help") {
+                std::cerr << "Unknown option: " << arg << "\nUse -h for help" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+
+    return params;
+}
+
+void print_help(const char* program_name) {
+    std::cout << "Usage: " << program_name << " [OPTIONS]\n"
+          << "Options:\n"
+          << "  -w, --weighted    Use weighted graph\n"
+          << "  -d, --directed    Use directed graph\n"
+          << "  -h, --help        Show this help message\n\n"
+          << "Examples:\n"
+          << "  " << program_name << " -w -d    # Weighted directed graph\n"
+          << "  " << program_name << " --weighted    # Weighted undirected graph\n"
+          << "  " << program_name << "          # Unweighted undirected graph\n";
+}
 ```
 
-#### 2. Adding Your Commands
+#### 2. Constructor with Graph Parameters
+The adapter now accepts graph type parameters:
+
+```cpp
+// Create adapter with specific graph types
+GraphConsoleAdapter console(true, false);  // Weighted undirected
+GraphConsoleAdapter console(false, true);  // Unweighted directed  
+GraphConsoleAdapter console(true, true);   // Weighted directed
+GraphConsoleAdapter console(false, false); // Unweighted undirected (default)
+```
+
+#### 3. Adding Your Commands
 Extend the adapter class to add your own commands:
 
 ```cpp
 class MyConsoleAdapter : public GraphConsoleAdapter {
 public:
-    MyConsoleAdapter(const std::string& config_path = "", const std::string& aliases_path = "")
-        : GraphConsoleAdapter(config_path, aliases_path) {
+    MyConsoleAdapter(bool weighted, bool directed, 
+                    const std::string& config_path = "", 
+                    const std::string& aliases_path = "")
+        : GraphConsoleAdapter(weighted, directed, config_path, aliases_path) {
         register_my_commands();
     }
 
@@ -87,6 +146,21 @@ private:
 ```
 
 ### Core Features
+
+#### Command Line Argument Parsing
+- **Flexible Options**: Support for both short (`-w`, `-d`) and long (`--weighted`, `--directed`) flags
+- **Help System**: Automatic help generation with examples
+- **Error Handling**: Clear error messages for invalid arguments
+- **Validation**: Proper type checking and boundary validation
+
+#### Graph Type Configuration
+```cpp
+// Program starts with predefined graph types
+GraphConsoleAdapter adapter(true, false); // Weighted undirected
+
+// All subsequent graph operations use these types
+adapter.run();
+```
 
 #### Command System
 - **Command Registration**: Easy registration with description, parameters, and usage
@@ -126,6 +200,26 @@ std::cout << console.get_color("success") << "Operation completed!"
 - Built-in exception handling for commands
 - Custom error messages
 - Help display on unknown commands
+
+### Usage Examples
+
+**Command Line:**
+```bash
+# Weighted directed graph
+./LiOAvIZ_Lab10 -w -d
+
+# Weighted undirected graph  
+./LiOAvIZ_Lab10 --weighted
+
+# Unweighted directed graph
+./LiOAvIZ_Lab10 --directed
+
+# Default (unweighted undirected)
+./LiOAvIZ_Lab10
+
+# Show help
+./LiOAvIZ_Lab10 --help
+```
 
 ### Configuration Files
 
@@ -194,21 +288,25 @@ target_include_directories(your_app PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 ### Быстрая интеграция
 
-#### 1. Базовая настройка
-Подключите заголовок и инициализируйте в `main.cpp`:
+#### 1. Базовая настройка с аргументами командной строки
+Подключите заголовок и инициализируйте в `main.cpp` с расширенным парсингом аргументов:
 
 ```cpp
 #include "adapters/console_adapter.h"
 
-int main() {
-    try {
-        // С указанием путей к конфигурации
-        GraphConsoleAdapter adapter("config/console.conf", "config/aliases.conf");
-    
-        // Или с автоматическим поиском конфигов
-        // GraphConsoleAdapter adapter;
+struct GraphParameters {
+    bool is_weighted;
+    bool is_directed;
+};
 
-        adapter.run();
+GraphParameters parse_args(int argc, char **argv);
+void print_help(const char* program_name);
+
+int main(const int argc, char *argv[]) {
+    try {
+        const GraphParameters params = parse_args(argc, argv);
+        GraphConsoleAdapter console(params.is_weighted, params.is_directed);
+        console.run();
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
@@ -218,16 +316,71 @@ int main() {
     }
     return 0;
 }
+
+GraphParameters parse_args(const int argc, char **argv) {
+    static const std::unordered_map<std::string, std::function<void(GraphParameters&)>> options = {
+        {"-w", [](GraphParameters& params) { params.is_weighted = true; }},
+        {"--weighted", [](GraphParameters& params) { params.is_weighted = true; }},
+        {"-d", [](GraphParameters& params) { params.is_directed = true; }},
+        {"--directed", [](GraphParameters& params) { params.is_directed = true; }}
+    };
+
+    GraphParameters params{false, false};
+
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+
+        if (arg == "-h" || arg == "--help") {
+            print_help(argv[0]);
+        }
+
+        if (auto it = options.find(arg); it != options.end()) {
+            it->second(params);
+        } else {
+            if (arg != "-h" && arg != "--help") {
+                std::cerr << "Unknown option: " << arg << "\nUse -h for help" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+
+    return params;
+}
+
+void print_help(const char* program_name) {
+    std::cout << "Usage: " << program_name << " [OPTIONS]\n"
+          << "Options:\n"
+          << "  -w, --weighted    Use weighted graph\n"
+          << "  -d, --directed    Use directed graph\n"
+          << "  -h, --help        Show this help message\n\n"
+          << "Examples:\n"
+          << "  " << program_name << " -w -d    # Weighted directed graph\n"
+          << "  " << program_name << " --weighted    # Weighted undirected graph\n"
+          << "  " << program_name << "          # Unweighted undirected graph\n";
+}
 ```
 
-#### 2. Добавление своих команд
+#### 2. Конструктор с параметрами графа
+Адаптер теперь принимает параметры типа графа:
+
+```cpp
+// Создание адаптера с определенными типами графов
+GraphConsoleAdapter console(true, false);  // Взвешенный неориентированный
+GraphConsoleAdapter console(false, true);  // Невзвешенный ориентированный
+GraphConsoleAdapter console(true, true);   // Взвешенный ориентированный
+GraphConsoleAdapter console(false, false); // Невзвешенный неориентированный (по умолчанию)
+```
+
+#### 3. Добавление своих команд
 Расширьте класс адаптера для добавления собственных команд:
 
 ```cpp
 class MyConsoleAdapter : public GraphConsoleAdapter {
 public:
-    MyConsoleAdapter(const std::string& config_path = "", const std::string& aliases_path = "")
-        : GraphConsoleAdapter(config_path, aliases_path) {
+    MyConsoleAdapter(bool weighted, bool directed, 
+                    const std::string& config_path = "", 
+                    const std::string& aliases_path = "")
+        : GraphConsoleAdapter(weighted, directed, config_path, aliases_path) {
         register_my_commands();
     }
 
@@ -265,6 +418,21 @@ private:
 ```
 
 ### Основные возможности
+
+#### Парсинг аргументов командной строки
+- **Гибкие опции**: Поддержка коротких (`-w`, `-d`) и длинных (`--weighted`, `--directed`) флагов
+- **Система помощи**: Автоматическая генерация справки с примерами
+- **Обработка ошибок**: Понятные сообщения об ошибках для неверных аргументов
+- **Валидация**: Проверка типов и граничных значений
+
+#### Конфигурация типа графа
+```cpp
+// Программа запускается с предопределенными типами графов
+GraphConsoleAdapter adapter(true, false); // Взвешенный неориентированный
+
+// Все последующие операции с графами используют эти типы
+adapter.run();
+```
 
 #### Система команд
 - **Регистрация команд**: Простая регистрация с описанием, параметрами и использованием
@@ -304,6 +472,26 @@ std::cout << console.get_color("success") << "Операция завершен�
 - Встроенная обработка исключений для команд
 - Пользовательские сообщения об ошибках
 - Показ справки при неизвестных командах
+
+### Примеры использования
+
+**Командная строка:**
+```bash
+# Взвешенный ориентированный граф
+./LiOAvIZ_Lab10 -w -d
+
+# Взвешенный неориентированный граф
+./LiOAvIZ_Lab10 --weighted
+
+# Невзвешенный ориентированный граф
+./LiOAvIZ_Lab10 --directed
+
+# По умолчанию (невзвешенный неориентированный)
+./LiOAvIZ_Lab10
+
+# Показать справку
+./LiOAvIZ_Lab10 --help
+```
 
 ### Конфигурационные файлы
 
