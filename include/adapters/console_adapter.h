@@ -5,6 +5,14 @@
 #ifndef CONSOLE_ADAPTER_H
 #define CONSOLE_ADAPTER_H
 
+#define SILENCE_COUT_BEGIN \
+std::streambuf* __cout_original_buf = std::cout.rdbuf(); \
+std::stringstream __cout_silent_buffer; \
+std::cout.rdbuf(__cout_silent_buffer.rdbuf());
+
+#define SILENCE_COUT_END \
+std::cout.rdbuf(__cout_original_buf);
+
 #include <memory>
 
 #include "../core/console.h"
@@ -40,6 +48,7 @@ class GraphConsoleAdapter {
     void cmd_help(const std::vector<std::string>& args);
     void cmd_history();
     void cmd_find(const std::vector<std::string>& args) const;
+    void cmd_analyse() const;
 
     static void cmd_smile();
 };

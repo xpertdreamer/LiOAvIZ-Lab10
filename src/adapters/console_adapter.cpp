@@ -169,6 +169,11 @@ void GraphConsoleAdapter::register_graph_commands() {
         [this](const std::vector<std::string>& args) { this->cmd_find(args); },
         "Find distances from selected vertex"
     );
+
+    console.register_command("analyse",
+        [this](const std::vector<std::string>&) {this->cmd_analyse(); },
+        "Analyse the graph"
+    );
 }
 
 void GraphConsoleAdapter::cmd_create(const std::vector<std::string>& args) {
@@ -259,5 +264,56 @@ void GraphConsoleAdapter::cmd_find(const std::vector<std::string> &args) const {
     } catch (const std::exception& e) {
         std::cout << "Error in BFS: " << e.what() << std::endl;
         std::cout << "Usage: find [start_v]" << std::endl;
+    }
+}
+
+void GraphConsoleAdapter::cmd_analyse() const {
+    if (!graphs_created) {
+        std::cout << "No graphs created. Use 'create' command first." << std::endl;
+        return;
+    }
+
+    try {
+        std::cout << "=== GRAPH ANALYSIS ===" << std::endl;
+
+        SILENCE_COUT_BEGIN
+        const auto dist_matrix = build_distance_matrix(*graph);
+        SILENCE_COUT_END
+        print_distance_matrix(dist_matrix);
+
+        const auto ecc = compute_eccentricities(dist_matrix);
+
+        std::cout << "\nEccentricities:" << std::endl;
+        for (int i = 0; i < static_cast<int>(ecc.size()); i++) {
+            std::cout << "Vertex " << i << ": ";
+            if (ecc[i] == -1) {
+                std::cout << "inf (isolated)";
+            } else {
+                std::cout << ecc[i];
+            }
+            std::cout << std::endl;
+        }
+
+        const int radius = compute_radius(ecc);
+        const int diameter = compute_diameter(ecc);
+
+        const auto central = find_central_vertices(ecc, radius);
+        const auto peripheral = find_peripheral_vertices(ecc, diameter);
+
+        std::cout << "\n=== RESULTS ===" << std::endl;
+        std::cout << "Radius: " << (radius == -1 ? "inf (graph is disconnected)" : std::to_string(radius)) << std::endl;
+        std::cout << "Diameter: " << (radius == -1 ? "inf (graph is disconnected)" : std::to_string(diameter)) << std::endl;
+
+        std::cout << "Central vertices (eccentricity == radius): ";
+        if (central.empty()) std::cout << "none";
+        else for (const int v : central) std::cout << v << " ";
+        std::cout << std::endl;
+
+        std::cout << "Peripheral vertices (eccentricity == diameter): ";
+        if (peripheral.empty()) std::cout << "none";
+        else for (const int v : peripheral) std::cout << v << " ";
+        std::cout << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error in ANALYSIS: " << e.what() << std::endl;
     }
 }

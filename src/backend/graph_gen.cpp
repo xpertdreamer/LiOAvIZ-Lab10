@@ -134,7 +134,7 @@ void delete_graph(Graph& graph, const int n) {
 
 void print_list(const std::vector<std::vector<std::pair<int, int>>> &list, const char* name) {
     std::cout << name << ":" << std::endl;
-    for (int i = 0; i < list.size(); i++) {
+    for (int i = 0; i < static_cast<int>(list.size()); i++) {
         std::cout << i << ": ";
         for (const auto&[fst, snd] : list[i]) {
             std::cout << "(" << fst << ", " << snd << ") ";
@@ -172,7 +172,7 @@ void BFSD(const Graph &graph, const int start_v, std::vector<int> &DIST) {
 
 void print_distances(const std::vector<int> &DIST, const int start_v) {
     std::cout << "Distances from vertex " << start_v << ":" << std::endl;
-    for (int i = 0; i < DIST.size(); i++) {
+    for (int i = 0; i < static_cast<int>(DIST.size()); i++) {
         if (DIST[i] == -1) {
             std::cout << "Vertex " << i << ": unreachable" << std::endl;
         } else {
@@ -195,7 +195,7 @@ std::vector<std::vector<int> > build_distance_matrix(const Graph &graph) {
 std::vector<int> compute_eccentricities(const std::vector<std::vector<int> > &dist_matrix) {
     std::vector<int> eccentricities(dist_matrix.size(), -1);
 
-    for (int i = 0; i < dist_matrix.size(); i++) {
+    for (int i = 0; i < static_cast<int>(dist_matrix.size()); i++) {
         int max_dist = -1;
         for (int j : dist_matrix[i]) {
             if (j != -1 && j > max_dist) {
@@ -235,7 +235,7 @@ int compute_diameter(const std::vector<int> &ecc) {
 std::vector<int> find_central_vertices(const std::vector<int> &ecc, const int radius) {
     std::vector<int> central_vertices;
 
-    for (int i = 0; i < ecc.size(); i++) {
+    for (int i = 0; i < static_cast<int>(ecc.size()); i++) {
         if (ecc[i] == radius) {
             central_vertices.push_back(i);
         }
@@ -244,10 +244,10 @@ std::vector<int> find_central_vertices(const std::vector<int> &ecc, const int ra
     return central_vertices;
 }
 
-std::vector<int> find_peripheral_vertices(const std::vector<int> &ecc, int diameter) {
+std::vector<int> find_peripheral_vertices(const std::vector<int> &ecc, const int diameter) {
     std::vector<int> peripheral_vertices;
 
-    for (int i = 0; i < ecc.size(); i++) {
+    for (int i = 0; i < static_cast<int>(ecc.size()); i++) {
         if (ecc[i] == diameter) {
             peripheral_vertices.push_back(i);
         }
@@ -256,23 +256,31 @@ std::vector<int> find_peripheral_vertices(const std::vector<int> &ecc, int diame
     return peripheral_vertices;
 }
 
-void print_distances_matrix(const std::vector<std::vector<int> > &dist_matrix) {
+void print_distance_matrix(const std::vector<std::vector<int>> &dist_matrix) {
     const int n = static_cast<int>(dist_matrix.size());
+    constexpr int cell_width = 4;
 
     std::cout << "Distances matrix:" << std::endl;
-    std::cout << "    ";
+    std::cout << std::setw(cell_width + 1) << " ";
     for (int j = 0; j < n; j++) {
-        std::cout << std::setw(3) << j << " ";
+        std::cout << std::setw(cell_width) << j << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << std::setw(cell_width) <<  "  +";
+    for (int j = 0; j <= n; j++) {
+        std::cout << std::string(cell_width + 1, '-');
     }
     std::cout << std::endl;
 
     for (int i = 0; i < n; i++) {
-        std::cout << i << " | ";
+        if (i > 9) std::cout << i << std::setw(cell_width - 1) << "| ";
+        else std::cout << i << std::setw(cell_width) << " | ";
         for (int j = 0; j < n; j++) {
             if (dist_matrix[i][j] == -1) {
-                std::cout << std::setw(3) << "inf" << " ";
+                std::cout << std::setw(cell_width) << "inf" << " ";
             } else {
-                std::cout << std::setw(3) << dist_matrix[i][j] << " ";
+                std::cout << std::setw(cell_width) << dist_matrix[i][j] << " ";
             }
         }
         std::cout << std::endl;
