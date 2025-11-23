@@ -232,3 +232,14 @@ int compute_diameter(const std::vector<int> &ecc) {
     return diameter;
 }
 
+std::vector<int> find_central_vertices(const std::vector<int> &ecc, int radius) {
+    std::vector<int> central_vertices;
+
+    for (int i = 0; i < ecc.size(); i++) {
+        if (ecc[i] == radius) {
+            central_vertices.push_back(i);
+        }
+    }
+
+    return central_vertices;
+}
