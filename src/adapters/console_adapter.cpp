@@ -24,8 +24,8 @@
 namespace fs = std::filesystem;
 
 GraphConsoleAdapter::GraphConsoleAdapter(bool is_weighted, bool is_directed ,const std::string& config_path, const std::string& aliases_path): graphs_created(false), graph(nullptr), n(0) {
-    // const std::string config_file = ("../../resources/config_files/graph_console.conf");
-    // const std::string aliases_file = ("../../resources/config_files/aliases.conf");
+    weighted = is_weighted;
+    directed = is_directed;
 
     std::string actual_config_path = config_path;
     std::string actual_aliases_path = aliases_path;
@@ -172,7 +172,6 @@ void GraphConsoleAdapter::cmd_create(const std::vector<std::string>& args) {
         const double new_edge_prob = args.size() > 1 ?  std::stod(args[1]) : 0.5;
         const double new_loop_prob = args.size() > 2 ?  std::stod(args[2]) : 0.3;
 
-
         if (new_n <= 0) {
             std::cout << "Invalid number of vertices." << std::endl;
             return;
@@ -185,7 +184,7 @@ void GraphConsoleAdapter::cmd_create(const std::vector<std::string>& args) {
         cleanup();
 
         n = new_n;
-        graph = std::make_unique<Graph>(create_graph(n, new_edge_prob, new_loop_prob, 0));
+        graph = std::make_unique<Graph>(create_graph(n, new_edge_prob, new_loop_prob, 0, weighted, directed));
         graphs_created = true;
 
         std::cout << "Created two graphs with " << n << " vertices" << std::endl;

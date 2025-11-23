@@ -24,6 +24,8 @@ class GraphConsoleAdapter {
     bool graphs_created;
     std::unique_ptr<Graph> graph;
     int n;
+    bool weighted;
+    bool directed;
 
     void cleanup();
     void register_graph_commands();

@@ -11,7 +11,7 @@
 
 struct Graph {
     int** adj_matrix;
-    std::vector<std::vector<int>> adj_list;
+    std::vector<std::vector<std::pair<int, int>>> adj_list;
     int n;
 };
 
@@ -21,9 +21,11 @@ struct Graph {
  * @param edgeProb Edge generating probability
  * @param loopProb Loop edge generating probability
  * @param seed Seed for random generator
+ * @param weighted Value that determines whether the graph is weighted
+ * @param directed Value that determines whether the graph is directed
  * @return New Graph
  */
-extern Graph create_graph(int n, double edgeProb = 0.4, double loopProb = 0.15, unsigned int seed = 0);
+extern Graph create_graph(int n, double edgeProb = 0.4, double loopProb = 0.15, unsigned int seed = 0, bool weighted = false, bool directed = false);
 
 // Function to display the matrix
 extern void print_matrix(int **matrix, int rows, int cols, const char *name);
@@ -32,5 +34,5 @@ extern void print_matrix(int **matrix, int rows, int cols, const char *name);
 extern void delete_graph(Graph& graph, int n);
 
 // Display adj list
-extern void print_list(const std::vector<std::vector<int>> &list, const char *name);
+extern void print_list(const std::vector<std::vector<std::pair<int, int>>> &list, const char *name);
 #endif //GRAPH_GEN_H
