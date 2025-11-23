@@ -35,4 +35,27 @@ extern void delete_graph(Graph& graph, int n);
 
 // Display adj list
 extern void print_list(const std::vector<std::vector<std::pair<int, int>>> &list, const char *name);
+
+/**
+ * Breadth First Search (BFS) algorithm for finding distances from a source vertex
+ * @param graph Graph being examined
+ * @param start_v Start vertex
+ * @return Vector of distances
+ */
+extern std::vector<int> find_distances(const Graph& graph, int start_v);
+
+/**
+ * BFS Helper Function
+ * @param graph Graph being examined
+ * @param start_v Start vertex
+ * @param DIST Vector of distances
+ */
+extern void BFSD(const Graph& graph, int start_v, std::vector<int>& DIST);
+
+/**
+ * Distance vector output
+ * @param DIST Vector of distances
+ * @param start_v Start vector
+ */
+extern void print_distances(const std::vector<int>& DIST, int start_v);
 #endif //GRAPH_GEN_H

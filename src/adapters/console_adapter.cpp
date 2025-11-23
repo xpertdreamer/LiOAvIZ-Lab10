@@ -164,6 +164,11 @@ void GraphConsoleAdapter::register_graph_commands() {
         [this](const std::vector<std::string>&) { cmd_smile(); },
         "SMILE!!!!!"
     );
+
+    console.register_command("find",
+        [this](const std::vector<std::string>& args) { this->cmd_find(args); },
+        "Find distances from selected vertex"
+    );
 }
 
 void GraphConsoleAdapter::cmd_create(const std::vector<std::string>& args) {
@@ -231,4 +236,28 @@ void GraphConsoleAdapter::cmd_help(const std::vector<std::string>& args) {
 
 void GraphConsoleAdapter::cmd_history() {
     console.show_history();
+}
+
+void GraphConsoleAdapter::cmd_find(const std::vector<std::string> &args) const {
+    if (!graphs_created) {
+        std::cout << "No graphs created. Use 'create' command first." << std::endl;
+        return;
+    }
+
+    try {
+        const int start_v = args.empty() ? 0 : std::stoi(args[0]);
+
+        if (start_v < 0 || start_v >= n) {
+            std::cout << "Invalid start vertex. Must be between 0 and " << n - 1 << std::endl;
+            return;
+        }
+
+        std::cout << "BFS traversal order: ";
+        const std::vector<int> distances = find_distances(*graph, start_v);
+        std::cout << std::endl;
+        print_distances(distances, start_v);
+    } catch (const std::exception& e) {
+        std::cout << "Error in BFS: " << e.what() << std::endl;
+        std::cout << "Usage: find [start_v]" << std::endl;
+    }
 }

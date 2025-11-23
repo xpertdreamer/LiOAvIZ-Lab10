@@ -3,9 +3,10 @@
 #include "../../include/backend/graph_gen.h"
 
 #include <chrono>
+#include <queue>
 
 Graph create_graph(const int n, const double edgeProb, const double loopProb,
-                    const unsigned int seed, const bool weighted, const bool directed) {
+                   const unsigned int seed, const bool weighted, const bool directed) {
     Graph graph;
     graph.n = n;
 
@@ -139,5 +140,43 @@ void print_list(const std::vector<std::vector<std::pair<int, int>>> &list, const
             std::cout << "(" << fst << ", " << snd << ") ";
         }
         std::cout << std::endl;
+    }
+}
+
+std::vector<int> find_distances(const Graph &graph, const int start_v) {
+    std::vector<int> distances(graph.n, -1);
+    BFSD(graph, start_v, distances);
+    return distances;
+}
+
+void BFSD(const Graph &graph, const int start_v, std::vector<int> &DIST) {
+    std::queue<int> q;
+    q.push(start_v);
+    DIST[start_v] = 0;
+
+    while (!q.empty()) {
+        const int curr_v = q.front();
+
+        q.pop();
+        std::cout << curr_v << " ";
+        for (int i = 0; i < graph.n; i++) {
+            if (graph.adj_matrix[curr_v][i] > 0 && DIST[i] == -1) {
+                q.push(i);
+                DIST[i] = DIST[curr_v] + graph.adj_matrix[curr_v][i];
+            }
+        }
+    }
+
+    std::cout << std::endl;
+}
+
+void print_distances(const std::vector<int> &DIST, const int start_v) {
+    std::cout << "Distances from vertex " << start_v << ":" << std::endl;
+    for (int i = 0; i < DIST.size(); i++) {
+        if (DIST[i] == -1) {
+            std::cout << "Vertex " << i << ": unreachable" << std::endl;
+        } else {
+            std::cout << "Vertex " << i << ": " << DIST[i] << std::endl;
+        }
     }
 }
