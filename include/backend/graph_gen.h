@@ -80,4 +80,7 @@ extern std::vector<int> find_central_vertices(const std::vector<int>& ecc, int r
 
 
 extern std::vector<int> find_peripheral_vertices(const std::vector<int>& ecc, int diameter);
+
+
+extern void print_distances_matrix(const std::vector<std::vector<int>>& dist_matrix);
 #endif //GRAPH_GEN_H

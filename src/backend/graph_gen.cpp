@@ -255,3 +255,26 @@ std::vector<int> find_peripheral_vertices(const std::vector<int> &ecc, int diame
 
     return peripheral_vertices;
 }
+
+void print_distances_matrix(const std::vector<std::vector<int> > &dist_matrix) {
+    const int n = static_cast<int>(dist_matrix.size());
+
+    std::cout << "Distances matrix:" << std::endl;
+    std::cout << "    ";
+    for (int j = 0; j < n; j++) {
+        std::cout << std::setw(3) << j << " ";
+    }
+    std::cout << std::endl;
+
+    for (int i = 0; i < n; i++) {
+        std::cout << i << " | ";
+        for (int j = 0; j < n; j++) {
+            if (dist_matrix[i][j] == -1) {
+                std::cout << std::setw(3) << "inf" << " ";
+            } else {
+                std::cout << std::setw(3) << dist_matrix[i][j] << " ";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
