@@ -10,65 +10,54 @@ Graph create_graph(const int n, const double edgeProb, const double loopProb,
     Graph graph;
     graph.n = n;
 
-    // Matrix memory allocating
+    // Matrix memory allocation and initialization
     graph.adj_matrix = new int*[n];
     for (int i = 0; i < n; i++) {
-        graph.adj_matrix[i] = new int[n];
-        for (int j = 0; j < n; j++) {
-            graph.adj_matrix[i][j] = 0;
-        }
+        graph.adj_matrix[i] = new int[n](); // Zero-initialize
     }
 
     // List initialization
     graph.adj_list.resize(n);
 
+    // Random generator initialization
     static unsigned int counter = 0;
     const auto now = std::chrono::high_resolution_clock::now();
     const auto nanos = std::chrono::time_point_cast<std::chrono::nanoseconds>(now).time_since_epoch().count();
     unsigned int state = seed == 0 ? static_cast<unsigned int>(nanos) + counter++ : seed;
 
-        for (int i = 0; i < n; i++) {
+    // Helper function for random number generation
+    auto next_rand = [&state]() -> int {
+        state = (state * 1664525 + 1013904223) & 0x7fffffff;
+        return static_cast<int>(state) % 100;
+    };
+
+    auto next_weight = [&state]() -> int {
+        state = (state * 1664525 + 1013904223) & 0x7fffffff;
+        return (static_cast<int>(state) % 10) + 1;
+    };
+
+    // Process all possible edges
+    for (int i = 0; i < n; i++) {
         for (int j = directed ? 0 : i; j < n; j++) {
             if (!directed && j < i) continue;
 
-            state = (state * 1664525 + 1013904223) & 0x7fffffff;
-            const int rand_value = static_cast<int>(state) % 100;
+            const bool is_loop = (i == j);
+            const double probability = is_loop ? loopProb : edgeProb;
 
-            if (i == j) {
-                if (rand_value < static_cast<int>(loopProb * 100)) {
-                    if (weighted) {
-                        state = (state * 1664525 + 1013904223) & 0x7fffffff;
-                        int weight = (static_cast<int>(state) % 10) + 1;
-                        graph.adj_matrix[i][j] = weight;
-                        graph.adj_list[i].emplace_back(i, weight);
-                    } else {
-                        graph.adj_matrix[i][j] = 1;
-                        graph.adj_list[i].emplace_back(i, 1);
-                    }
-                }
-            } else {
-                if (rand_value < static_cast<int>(edgeProb * 100)) {
-                    if (weighted) {
-                        state = (state * 1664525 + 1013904223) & 0x7fffffff;
-                        int weight = (static_cast<int>(state) % 10) + 1;
+            if (next_rand() >= static_cast<int>(probability * 100)) {
+                continue;
+            }
 
-                        graph.adj_matrix[i][j] = weight;
-                        graph.adj_list[i].emplace_back(j, weight);
+            const int weight = weighted ? next_weight() : 1;
 
-                        if (!directed) {
-                            graph.adj_matrix[j][i] = weight;
-                            graph.adj_list[j].emplace_back(i, weight);
-                        }
-                    } else {
-                        graph.adj_matrix[i][j] = 1;
-                        graph.adj_list[i].emplace_back(j, 1);
+            // Set matrix value
+            graph.adj_matrix[i][j] = weight;
+            graph.adj_list[i].emplace_back(j, weight);
 
-                        if (!directed) {
-                            graph.adj_matrix[j][i] = 1;
-                            graph.adj_list[j].emplace_back(i, 1);
-                        }
-                    }
-                }
+            // For undirected graphs, set symmetric value
+            if (!directed && !is_loop) {
+                graph.adj_matrix[j][i] = weight;
+                graph.adj_list[j].emplace_back(i, weight);
             }
         }
     }
